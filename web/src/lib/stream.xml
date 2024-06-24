@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Start>
+        <Stream name="Floyd Audio Stream"
+            url="wss://really-first-goat.ngrok-free.app/audiostream" />
+    </Start>
+</Response>

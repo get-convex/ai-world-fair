@@ -1,0 +1,50 @@
+.dot {
+  border-radius: 50%;
+  position: relative;
+}
+
+.dot::before {
+  @apply bg-green-400;
+  content: "";
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: pulse 1500ms infinite;
+  box-shadow: 0 0 0 #fff;
+  @apply shadow-green-400;
+}
+
+.successDot {
+  border-radius: 50%;
+  position: relative;
+}
+
+.successDot::before {
+  @apply bg-green-500;
+  content: "";
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-shadow: 0 0 0 #fff;
+  @apply shadow-green-500;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  75% {
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
