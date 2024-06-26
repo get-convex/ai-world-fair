@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import OpenAI from 'openai';
 
 import { convertOpusArrayBufferToMuLaw } from './audio';
-import floydRequestPrompt from './prompts/floydRequestPrompt';
+import { contextPrompt, floydRequestPrompt } from './prompts/floydRequestPrompt';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const { gray, green } = chalk;
 
@@ -29,14 +29,46 @@ const speak = async (text: string): Promise<string | null> => {
   return payload || null;
 };
 
-const sendToOpenAI = async (previousMessages: any[], text: string): Promise<string | null> => {
+const gatherContextWithOpenAI = async (
+  context: string[],
+  request: string,
+  previousMessages: any[]
+): Promise<string | null> => {
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
   const today = new Date().toLocaleDateString('en-US', options);
   try {
     console.time(gray('Response from GPT4'));
     const response = await openai.chat.completions.create({
       model: 'gpt-4o',
-      messages: floydRequestPrompt(text, previousMessages, today),
+      messages: contextPrompt(request, context, today, previousMessages),
+    });
+    return response.choices[0]?.message?.content || "Sorry, couldn't quite figure this one out.";
+  } catch (error: any) {
+    if (error.response) {
+      console.error(error.response.status, error.response.data);
+    } else {
+      console.error(`Error with OpenAI API request: ${error.message}`);
+    }
+  } finally {
+    console.timeEnd(gray('Response from GPT4'));
+  }
+
+  // TODO: Throw error instead of return null
+  return null;
+};
+
+const sendToOpenAI = async (
+  previousMessages: any[],
+  text: string,
+  priorContext: string | undefined
+): Promise<string | null> => {
+  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+  const today = new Date().toLocaleDateString('en-US', options);
+  try {
+    console.time(gray('Response from GPT4'));
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: floydRequestPrompt(text, previousMessages, today, priorContext || ''),
     });
     return response.choices[0]?.message?.content || "Sorry, I'll have to call you back.";
   } catch (error: any) {
@@ -53,4 +85,4 @@ const sendToOpenAI = async (previousMessages: any[], text: string): Promise<stri
   return null;
 };
 
-export { sendToOpenAI, speak };
+export { gatherContextWithOpenAI, sendToOpenAI, speak };

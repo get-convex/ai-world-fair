@@ -4,14 +4,15 @@
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 
+console.log("accountSid: ", accountSid);
+console.log("authToken: ", authToken);
+
 const client = require("twilio")(accountSid, authToken);
 
 import OpenAI from "openai";
-import textToSpeech from "@google-cloud/text-to-speech";
 import speech from "@google-cloud/speech";
 
 const openai = new OpenAI();
-const TTSclient = new textToSpeech.TextToSpeechClient();
 const speechClient = new speech.SpeechClient();
 
 let _audioStream;
@@ -67,7 +68,7 @@ const makeCall = async (toNumber) => {
 
   const call = await client.calls.create({
     record: true,
-    statusCallback: "https://really-first-goat.ngrok-free.app/v1/dev/twiml",
+    statusCallback: "https://really-first-goat.ngrok-free.app/twiml",
     statusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
     statusCallbackMethod: "POST",
     to: `+${toNumber}`,
